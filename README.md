@@ -2,21 +2,21 @@
 
 UITask is a server-side add-on for Vaadin 7 that provides a simple framework for executing background tasks and updating the UI safely.
 
-The add-on is primarily composed of a task that can be run on a background thread via an [Executor|https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executor.html] and then complete the work safely in the UI thread/lock via a UIAccessor. Vaadin is not thread-safe, therefore all UI modifications must be done after obtaining the UI lock. This add-on attempts to simplify that process by providing an implementation of [Future|https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html] and exposing methods that are safely called in the UI thread.
+The add-on is primarily composed of a task that can be run on a background thread via an [Executor](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Executor.html) and then complete the work safely in the UI thread/lock via a UIAccessor. Vaadin is not thread-safe, therefore all UI modifications must be done after obtaining the UI lock. This add-on attempts to simplify that process by providing an implementation of [Future](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/Future.html) and exposing methods that are safely called in the UI thread.
 
-The add-on was inspired by by Swing's [SwingWorker|https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingWorker.html] and JavaFX's [Task|https://docs.oracle.com/javafx/2/api/javafx/concurrent/Task.html].
+The add-on was inspired by by Swing's [SwingWorker](https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingWorker.html) and JavaFX's [Task](https://docs.oracle.com/javafx/2/api/javafx/concurrent/Task.html).
 
 ## Example Usage
 
 ### UIAccessor
 
-UIAccessor is a simple interface that exposes the `access()` and `accessSynchronously()` methods of [UI|https://vaadin.com/api/7.6.6/com/vaadin/ui/UI.html]. The interface provides a separation of GUI code/dependencies from backend code which may help when using an MVVM or MVC pattern as well as assist with mocking in unit tests.
+UIAccessor is a simple interface that exposes the `access()` and `accessSynchronously()` methods of [UI](https://vaadin.com/api/7.6.6/com/vaadin/ui/UI.html). The interface provides a separation of GUI code/dependencies from backend code which may help when using an MVVM or MVC pattern as well as assist with mocking in unit tests.
 
 In most cases you can implement the interface in your UI subclass with no additional code. However you can also use the nested implementations UIAccessor.Fixed and UIAccessor.Current depending on the scenario.
 
 ### UITask
 
-UITask is the heart of the add-on. The task implements [RunnableFuture|https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/RunnableFuture.html] allowing it to be submitted to a standard Java Executor and then monitored or cancelled via the Future interface. Subclasses of the task must implement the `runInBackground()` method to perform any background work. When the background work is complete, the `done()` method is automatically called in the UI lock. The implementation can then use any of the Future methods to perform additional logic such as getting the result or checking for the cancelled state. For example:
+UITask is the heart of the add-on. The task implements [RunnableFuture](https://docs.oracle.com/javase/8/docs/api/java/util/concurrent/RunnableFuture.html) allowing it to be submitted to a standard Java Executor and then monitored or cancelled via the Future interface. Subclasses of the task must implement the `runInBackground()` method to perform any background work. When the background work is complete, the `done()` method is automatically called in the UI lock. The implementation can then use any of the Future methods to perform additional logic such as getting the result or checking for the cancelled state. For example:
 
 ```
 class MyTask extends UITask<Integer> {
@@ -63,15 +63,18 @@ class MyTask extends ProgressUITask<File> {
     if (!isCancelled()) {
       File result = get();
 
-      someUiComponent.setValue(result.getAbsolutePath());
+      someUiComponent.setValue("Download complete: " + result.getAbsolutePath());
+    }
+    else {
+      someUiComponent.setValue("Download cancelled.");
     }
   }
 }
 
 ProgressUITask<Integer> task = new MyTask(injectedUiAccessor);
-task.getTotal().addValueChangeListener(listener);
-task.getProgress().addValueChangeListener(listener);
-task.getMessage().addValueChangeListener(listener);
+totalLabel.setPropertyDataSource(task.getTotal());
+progressLabel.setPropertyDataSource(task.getProgress());;
+messageLabel.setPropertyDataSource(task.getMessage());
 executor.execute(task);
 ```
 
@@ -108,4 +111,4 @@ Contributions are welcome, but there are no guarantees that they are accepted as
 
 Add-on is distributed under Apache License 2.0. For license terms, see LICENSE.txt.
 
-UITask for Vaadin is written by [Mike Pilone|https://github.com/mpilone] with support from the [Public Radio Satellite System (PRSS)|http://www.prss.org].
+UITask for Vaadin is written by [Mike Pilone](https://github.com/mpilone) with support from the [Public Radio Satellite System (PRSS)](http://www.prss.org).

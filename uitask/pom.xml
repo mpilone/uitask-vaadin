@@ -7,7 +7,7 @@
   <artifactId>uitask-vaadin</artifactId>
   <packaging>jar</packaging>
   <version>1.0-SNAPSHOT</version>
-  <name>UITask for Vaadin Add-on</name>
+  <name>UITask for Vaadin</name>
 
   <parent>
     <groupId>org.mpilone.vaadin</groupId>
@@ -86,12 +86,6 @@
       <artifactId>vaadin-server</artifactId>
       <version>${vaadin.version}</version>
     </dependency>
-    <!--<dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-client</artifactId>
-      <version>${vaadin.version}</version>
-      <scope>provided</scope>
-    </dependency>-->
 		
     <!-- This can be replaced with TestNG or some other test framework supported by the surefire plugin -->
     <dependency>

@@ -6,13 +6,26 @@ The add-on is primarily composed of a task that can be run on a background threa
 
 The add-on was inspired by by Swing's [SwingWorker](https://docs.oracle.com/javase/8/docs/api/javax/swing/SwingWorker.html) and JavaFX's [Task](https://docs.oracle.com/javafx/2/api/javafx/concurrent/Task.html).
 
+## Benefits
+
+- Works with any standard Java Executor implementation.
+- Uses the standard Java Runnable and Future interfaces to avoid complexity.
+- Provides simple interfaces to separate UI code from backend code and to support dependency injection/mocking.
+- Provides access to the UI for manual synchronization such as progress updates.
+
 ## Example Usage
 
 ### UIAccessor
 
 UIAccessor is a simple interface that exposes the `access()` and `accessSynchronously()` methods of [UI](https://vaadin.com/api/7.6.6/com/vaadin/ui/UI.html). The interface provides a separation of GUI code/dependencies from backend code which may help when using an MVVM or MVC pattern as well as assist with mocking in unit tests.
 
-In most cases you can implement the interface in your UI subclass with no additional code. However you can also use the nested implementations UIAccessor.Fixed and UIAccessor.Current depending on the scenario.
+In most cases you can implement the interface in your UI subclass with no additional code. However you can also use the nested implementations UIAccessor.Fixed and UIAccessor.Current depending on the scenario. For example:
+
+```
+public class MyAppUI extends UI implements UIAccessor {
+  // ...
+}
+```
 
 ### UITask
 
@@ -27,9 +40,12 @@ class MyTask extends UITask<Integer> {
   }
 
   protected done() {
+    // Check if the task was cancelled during execution.
     if (!isCancelled()) {
       int result = get();
 
+      // Apply the UI change. Either directly modify components 
+      // or update an item/container for bound data.
       someUiComponent.setValue(result);  
     }
   }
@@ -71,10 +87,14 @@ class MyTask extends ProgressUITask<File> {
   }
 }
 
-ProgressUITask<Integer> task = new MyTask(injectedUiAccessor);
+ProgressUITask<File> task = new MyTask(injectedUiAccessor);
+
+// Bind the properties directly to the UI components.
 totalLabel.setPropertyDataSource(task.getTotal());
 progressLabel.setPropertyDataSource(task.getProgress());;
 messageLabel.setPropertyDataSource(task.getMessage());
+
+// Execute the task.
 executor.execute(task);
 ```
 

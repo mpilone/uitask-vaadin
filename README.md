@@ -54,6 +54,17 @@ class MyTask extends UITask<Integer> {
 Future<Integer> task = new MyTask(new UIAccessor.Current());
 executor.execute(task);
 ```
+#### Canceling a Task
+
+UITask implements the Future interface so you can cancel the task at any time. Canceling only prevents the background work from executing but it does not prevent the `done()` method from being called so cleanup work can always be performed. The `done()` method should check if the task was cancelled before calling `get()` and may want to apply different changes to the UI depending on the canceled state.
+
+```
+Future<Integer> task = new MyTask(new UIAccessor.Fixed(ui));
+executor.execute(task);
+
+// User click's cancel in the UI.
+task.cancel(false);
+```
 
 ### ProgressUITask
 
@@ -103,6 +114,10 @@ executor.execute(task);
 Official releases of this add-on are available at Vaadin Directory. For Maven instructions, download and reviews, go to http://vaadin.com/addon/uitask-vaadin
 
 ## Release notes
+
+### Version 1.1.0
+- Added test case for canceling before run.
+- Updated documentation.
 
 ### Version 1.0.0
 - Initial release

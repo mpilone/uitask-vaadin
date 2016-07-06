@@ -66,13 +66,13 @@ public class UITaskTestCase extends EasyMockSupport {
   }
 
   /**
-   * Tests running the UITask that gets cancelled.
+   * Tests running the UITask that gets canceled while it is running.
    *
    * @throws InterruptedException
    * @throws ExecutionException
    */
   @Test(expected = CancellationException.class)
-  public void testRun_Cancelled() throws InterruptedException,
+  public void testRun_Cancel_In_Run() throws InterruptedException,
       ExecutionException {
 
     // Given
@@ -95,6 +95,41 @@ public class UITaskTestCase extends EasyMockSupport {
     assertTrue(task.isCancelled());
     assertTrue(task.doneCalled);
     assertTrue(task.cancelledInDone);
+
+    // Exception expected.
+    task.get();
+  }
+  /**
+   * Tests running the UITask that gets canceled before it is running.
+   *
+   * @throws InterruptedException
+   * @throws ExecutionException
+   */
+  @Test(expected = CancellationException.class)
+  public void testRun_Cancel_Before_Run() throws InterruptedException,
+      ExecutionException {
+
+    // Given
+    final UITask task = partialMockBuilder(UITask.class).withConstructor(
+        new UIAccessor.Fixed(ui)).createMock();
+
+    expect(ui.access(isA(Runnable.class))).andAnswer(() -> {
+      Runnable r = (Runnable) EasyMock.getCurrentArguments()[0];
+      r.run();
+      return accessFuture;
+    });
+    task.done();
+
+    // When
+    replayAll();
+
+    task.cancel(false);
+    task.run();
+
+    // Then
+    verifyAll();
+
+    assertTrue(task.isCancelled());
 
     // Exception expected.
     task.get();

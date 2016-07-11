@@ -6,16 +6,20 @@
   <groupId>org.mpilone.vaadin</groupId>
   <artifactId>uitask-vaadin</artifactId>
   <packaging>jar</packaging>
-  <version>1.1-SNAPSHOT</version>
+  <version>1.1.0</version>
   <name>UITask for Vaadin</name>
 
-  <parent>
-    <groupId>org.mpilone.vaadin</groupId>
-    <artifactId>uitask-vaadin-parent</artifactId>
-    <version>1.1-SNAPSHOT</version>
-  </parent>
+  <!-- The Vaadin Directory doesn't support multi-module builds so we
+   can't refer to the parent here like we normally would for a multi-module
+   configuration. -->
 
   <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <maven.compiler.source>1.8</maven.compiler.source>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <vaadin.version>7.6.6</vaadin.version>
+    <vaadin.plugin.version>${vaadin.version}</vaadin.plugin.version>
+    
     <!-- ZIP Manifest fields -->
     <Implementation-Version>${project.version}</Implementation-Version>
     <!-- Must not change this because of the Directory -->

@@ -118,6 +118,7 @@ Official releases of this add-on are available at Vaadin Directory. For Maven in
 ### Version 1.1.0
 - Added test case for canceling before run.
 - Updated documentation.
+- Fixed a packaging bug where the parent POM was referenced from the module. This is not supported in the Vaadin Directory.
 
 ### Version 1.0.0
 - Initial release

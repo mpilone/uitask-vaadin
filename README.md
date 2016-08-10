@@ -54,6 +54,23 @@ class MyTask extends UITask<Integer> {
 Future<Integer> task = new MyTask(new UIAccessor.Current());
 executor.execute(task);
 ```
+
+UITask does not push any changes or update the client with regard to background operations therefore the client's state may be out of sync with the server state. If the UI is configured with the automatic push transport, Vaadin will handle notifying the client automatically. However if the UI is configured for manual push, UI.push() must be called in the done() method. For example:
+
+```
+protected done() {
+  // Some logic to update the UI
+  // ...
+
+  // Push the changes to the client.
+  if (getUIAccessor() instanceof UI) {
+    ((UI)getUIAccessor()).push();
+  }
+}
+```
+
+Obviously the strategy for accessing the UI to call the push method may be different depending on the UIAccessor implementation in use. If push is not enabled in the UI, the client will not see a change until the next interaction by the user or client poll configured using UI.setPollInterval(). This is all normal Vaadin behavior related to asynchronous server side data changes and not UITask specific.
+
 #### Canceling a Task
 
 UITask implements the Future interface so you can cancel the task at any time. Canceling only prevents the background work from executing but it does not prevent the `done()` method from being called so cleanup work can always be performed. The `done()` method should check if the task was cancelled before calling `get()` and may want to apply different changes to the UI depending on the canceled state.
